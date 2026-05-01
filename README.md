@@ -6,6 +6,7 @@ An [OpenCode](https://opencode.ai) custom tool for safely inspecting `.env` file
 
 - Check if one or more keys exist in a `.env` file
 - Check if one or more keys have empty values
+- List all key names in a `.env` file
 - Supports quoted values (`KEY="VALUE"`, `KEY='VALUE'`)
 - Ignores comments (`#`) and blank lines
 - Custom env file path support (e.g. `.env.local`, `.env.production`)
@@ -28,7 +29,7 @@ cp env.ts ~/.config/opencode/tools/env.ts
 
 ## Usage
 
-Once installed, two tools become available to the LLM in OpenCode:
+Once installed, three tools become available to the LLM in OpenCode:
 
 ### `env_check` — Check key existence
 
@@ -46,6 +47,23 @@ Example result:
   "DATABASE_URL": true,
   "REDIS_URL": true,
   "MISSING_KEY": false
+}
+```
+
+### `env_list` — List all key names
+
+Returns all key names in the env file without any values.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `envFile` | `string` | No | `.env` | Path to env file, relative to project root |
+
+Example result:
+
+```json
+{
+  "keys": ["DATABASE_URL", "REDIS_URL", "API_KEY"],
+  "count": 3
 }
 ```
 

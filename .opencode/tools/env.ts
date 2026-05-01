@@ -30,9 +30,10 @@ function parseEnvFile(filePath: string): Map<string, string> {
   return env
 }
 
-function resolveEnvPath(envFile: string, worktree: string): string {
-  if (envFile.startsWith("/")) return envFile
-  return join(worktree, envFile)
+function resolveEnvPath(envFile: string | undefined, worktree: string): string {
+  const resolved = envFile || ".env"
+  if (resolved.startsWith("/")) return resolved
+  return join(worktree, resolved)
 }
 
 export const check = tool({
@@ -62,6 +63,27 @@ export const check = tool({
     }
 
     return JSON.stringify(results, null, 2)
+  },
+})
+
+export const list = tool({
+  description:
+    "List all key names in a .env file. Returns key names and count without exposing values.",
+  args: {
+    envFile: tool.schema
+      .string()
+      .default(".env")
+      .describe("Path to the env file, relative to project root. Default: .env"),
+  },
+  async execute(args, context) {
+    const filePath = resolveEnvPath(args.envFile, context.worktree)
+    const env = parseEnvFile(filePath)
+
+    if (env.size === 0) {
+      return `File not found or empty: ${args.envFile}`
+    }
+
+    return JSON.stringify({ keys: Array.from(env.keys()), count: env.size }, null, 2)
   },
 })
 
